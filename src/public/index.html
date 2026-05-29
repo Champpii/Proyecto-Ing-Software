@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Marbetes - Acceso Vehicular Universitario</title>
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Tabler Icons (clean outline vector icons) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  
+  <!-- Premium CSS stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- GLOBAL LOADING INDICATOR -->
+  <div id="global-loader" class="loader-overlay hidden">
+    <div class="loader-spinner"></div>
+    <p id="global-loader-text">Procesando...</p>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- LOGIN PAGE -->
+  <div id="page-login" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="brand-logo">
+          <i class="ti ti-shield-check"></i>
+        </div>
+        <h1>Portal de Marbetes</h1>
+        <p>Sistema de Control de Acceso Vehicular Universitario</p>
+      </div>
+      
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-email"><i class="ti ti-mail"></i> Correo Institucional</label>
+          <input type="email" id="login-email" value="admin@universidad.edu.gt" required placeholder="correo@universidad.edu.gt">
+        </div>
+        <div class="form-group">
+          <label for="login-password"><i class="ti ti-lock"></i> Contraseña</label>
+          <input type="password" id="login-password" value="password123" required placeholder="Contraseña">
+        </div>
+        <button type="submit" class="btn-primary btn-block">
+          Ingresar al Sistema <i class="ti ti-arrow-right"></i>
+        </button>
+      </form>
+      
+      <div class="login-footer">
+        <span class="badge badge-info">Demo Académica</span>
+        <p>Las credenciales están prellenadas para facilidad de prueba.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP LAYOUT -->
+  <div id="app-layout" class="app-layout hidden">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar no-print">
+      <div class="sidebar-brand">
+        <div class="brand-icon">UV</div>
+        <div class="brand-meta">
+          <h2>Portal Marbetes</h2>
+          <span>Control de Acceso</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <button class="nav-btn active" data-target="dashboard" onclick="switchTab('dashboard')">
+              <i class="ti ti-layout-dashboard"></i> <span>Inicio</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-target="pago" onclick="switchTab('pago')">
+              <i class="ti ti-credit-card"></i> <span>Pago de Marbete</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-target="consulta" onclick="switchTab('consulta')">
+              <i class="ti ti-search"></i> <span>Consulta de Placa</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" data-target="reimpresion" onclick="switchTab('reimpresion')">
+              <i class="ti ti-printer"></i> <span>Reimpresión</span>
+            </button>
+          </li>
+          <li class="nav-divider"></li>
+          <li>
+            <button class="nav-btn btn-danger-soft" onclick="resetDatabase()">
+              <i class="ti ti-refresh"></i> <span>Reiniciar Demo</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar">AD</div>
+          <div class="user-info">
+            <span class="username" id="display-username">Administrador</span>
+            <span class="userrole">Control de Garitas</span>
+          </div>
+          <button class="logout-btn" onclick="handleLogout()" title="Cerrar Sesión">
+            <i class="ti ti-logout"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN MAIN CONTENT CONTAINER -->
+    <main class="main-content">
+      
+      <!-- HEADER -->
+      <header class="main-header no-print">
+        <div class="header-left">
+          <h1 id="section-title">Panel de Control</h1>
+          <p id="section-subtitle">Gestión e historial de accesos universitarios</p>
+        </div>
+        <div class="header-right">
+          <div class="time-badge">
+            <i class="ti ti-clock"></i> <span id="current-time">--:--:--</span>
+          </div>
+          <button class="btn-outline btn-theme-toggle" onclick="toggleTheme()" title="Cambiar Tema">
+            <i class="ti ti-sun-moon" id="theme-icon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- PAGE: DASHBOARD -->
+      <section id="page-dashboard" class="app-page active">
+        <div class="dashboard-stats">
+          <div class="stat-card glass-card animate-fade-in">
+            <div class="stat-icon icon-success"><i class="ti ti-circle-check"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Marbetes Vigentes</span>
+              <h3 class="stat-value" id="stat-vigentes">-</h3>
+              <span class="stat-sub text-success">Acceso habilitado</span>
+            </div>
+          </div>
+          <div class="stat-card glass-card animate-fade-in" style="animation-delay: 0.1s">
+            <div class="stat-icon icon-warning"><i class="ti ti-alert-triangle"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Por Vencer (7 días)</span>
+              <h3 class="stat-value text-warning" id="stat-por-vencer">-</h3>
+              <span class="stat-sub text-warning">Requieren renovación</span>
+            </div>
+          </div>
+          <div class="stat-card glass-card animate-fade-in" style="animation-delay: 0.2s">
+            <div class="stat-icon icon-danger"><i class="ti ti-circle-x"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Marbetes Vencidos</span>
+              <h3 class="stat-value text-danger" id="stat-vencidos">-</h3>
+              <span class="stat-sub text-danger">Acceso bloqueado</span>
+            </div>
+          </div>
+          <div class="stat-card glass-card animate-fade-in" style="animation-delay: 0.3s">
+            <div class="stat-icon icon-info"><i class="ti ti-coin"></i></div>
+            <div class="stat-data">
+              <span class="stat-label">Recaudación Anual</span>
+              <h3 class="stat-value text-info" id="stat-recaudacion">Q -</h3>
+              <span class="stat-sub text-info">Ingresos registrados</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- QUICK ACTION CARDS -->
+          <div class="dashboard-main-col">
+            <div class="glass-card">
+              <div class="card-header">
+                <h2><i class="ti ti-category"></i> Módulos Operativos</h2>
+                <p>Gestione el flujo transaccional y operativo de marbetes</p>
+              </div>
+              <div class="modules-links">
+                <div class="mod-link-card pay" onclick="switchTab('pago')">
+                  <div class="mod-link-icon"><i class="ti ti-credit-card"></i></div>
+                  <h3>Pago de Marbete</h3>
+                  <p>Registrar vehículo y procesar cobro electrónico con entrega de comprobante y QR.</p>
+                  <span class="btn-action">Ir al módulo <i class="ti ti-arrow-right"></i></span>
+                </div>
+                <div class="mod-link-card query" onclick="switchTab('consulta')">
+                  <div class="mod-link-icon"><i class="ti ti-search"></i></div>
+                  <h3>Consulta por Placa</h3>
+                  <p>Buscar estado, vigencia, foto del vehículo, historial de pagos e historial de accesos.</p>
+                  <span class="btn-action">Ir al módulo <i class="ti ti-arrow-right"></i></span>
+                </div>
+                <div class="mod-link-card print" onclick="switchTab('reimpresion')">
+                  <div class="mod-link-icon"><i class="ti ti-printer"></i></div>
+                  <h3>Reimpresión en Factura</h3>
+                  <p>Imprimir o descargar en formato factura oficial con QR de verificación integrados.</p>
+                  <span class="btn-action">Ir al módulo <i class="ti ti-arrow-right"></i></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECENT ACTIVITY LOGS -->
+          <div class="dashboard-side-col">
+            <div class="glass-card full-height">
+              <div class="card-header">
+                <h2><i class="ti ti-timeline"></i> Trazabilidad de Accesos</h2>
+                <p>Auditoría de ingresos en garitas en tiempo real</p>
+              </div>
+              <div class="audit-timeline" id="recent-audit-logs">
+                <div class="empty-state">
+                  <i class="ti ti-database-off"></i>
+                  <p>Cargando registros de auditoría...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: PAGO (WIZARD STEPS) -->
+      <section id="page-pago" class="app-page">
+        <!-- STEPS PROGRESS BAR -->
+        <div class="wizard-progress no-print">
+          <div class="wizard-step active" id="wstep-1">
+            <span class="step-num">1</span>
+            <span class="step-text">Vehículo y Propietario</span>
+          </div>
+          <div class="wizard-connector"></div>
+          <div class="wizard-step" id="wstep-2">
+            <span class="step-num">2</span>
+            <span class="step-text">Tarifa y Plan</span>
+          </div>
+          <div class="wizard-connector"></div>
+          <div class="wizard-step" id="wstep-3">
+            <span class="step-num">3</span>
+            <span class="step-text">Pago Seguro</span>
+          </div>
+          <div class="wizard-connector"></div>
+          <div class="wizard-step" id="wstep-4">
+            <span class="step-num">4</span>
+            <span class="step-text">Comprobante</span>
+          </div>
+        </div>
+
+        <!-- STEP 1: VEHICLE & OWNER FORM -->
+        <div class="wizard-card glass-card" id="pago-panel-1">
+          <div class="card-header">
+            <h2><i class="ti ti-id-badge"></i> Registro de Datos</h2>
+            <p>Complete los datos del propietario institucional y del vehículo</p>
+          </div>
+          
+          <form id="form-pago-step1" onsubmit="goToPaymentStep2(event)">
+            <div class="form-section">
+              <h3><i class="ti ti-user"></i> Datos del Propietario</h3>
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="p-nombre">Nombre Completo <span class="required">*</span></label>
+                  <input type="text" id="p-nombre" required placeholder="Ej. María García López">
+                </div>
+                <div class="form-group col-6">
+                  <label for="p-cui">CUI / DPI <span class="required">*</span></label>
+                  <input type="text" id="p-cui" required placeholder="Ej. 2948 10294 0101">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="p-email">Correo Electrónico <span class="required">*</span></label>
+                  <input type="email" id="p-email" required placeholder="Ej. mgarcia@universidad.edu.gt">
+                </div>
+                <div class="form-group col-6">
+                  <label for="p-telefono">Teléfono</label>
+                  <input type="text" id="p-telefono" placeholder="Ej. 5555-0101">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-12">
+                  <label for="p-rol">Rol en la Institución <span class="required">*</span></label>
+                  <select id="p-rol" required onchange="handleRoleChange()">
+                    <option value="" disabled selected>Seleccione el rol...</option>
+                    <option value="Estudiante">Estudiante (Precios diferenciados)</option>
+                    <option value="Docente">Docente / Profesor</option>
+                    <option value="Administrativo">Personal Administrativo</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3><i class="ti ti-car"></i> Datos del Vehículo</h3>
+              <div class="form-row">
+                <div class="form-group col-4">
+                  <label for="p-tipo-placa">Tipo de Placa <span class="required">*</span></label>
+                  <select id="p-tipo-placa" required>
+                    <option value="" disabled selected>Seleccione...</option>
+                    <option value="Particular">Particular (P)</option>
+                    <option value="Comercial">Comercial (C)</option>
+                    <option value="Motocicleta">Motocicleta (M)</option>
+                  </select>
+                </div>
+                <div class="form-group col-4">
+                  <label for="p-placa">Número de Placa <span class="required">*</span></label>
+                  <input type="text" id="p-placa" required placeholder="Ej. P-123ABC" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group col-4">
+                  <label for="p-anio">Año</label>
+                  <input type="number" id="p-anio" placeholder="Ej. 2021" min="1980" max="2027">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-4">
+                  <label for="p-marca">Marca <span class="required">*</span></label>
+                  <input type="text" id="p-marca" required placeholder="Ej. Toyota">
+                </div>
+                <div class="form-group col-4">
+                  <label for="p-modelo">Modelo <span class="required">*</span></label>
+                  <input type="text" id="p-modelo" required placeholder="Ej. Yaris">
+                </div>
+                <div class="form-group col-4">
+                  <label for="p-color">Color</label>
+                  <input type="text" id="p-color" placeholder="Ej. Gris Metálico">
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">
+                Continuar <i class="ti ti-arrow-right"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- STEP 2: TARIFS & PLANS -->
+        <div class="wizard-card glass-card hidden" id="pago-panel-2">
+          <div class="card-header">
+            <h2><i class="ti ti-wallet"></i> Selección de Tarifa</h2>
+            <p>El costo se calcula dinámicamente de acuerdo al rol del propietario</p>
+          </div>
+
+          <div class="pricing-summary-box">
+            <span class="box-badge">Rol Detectado: <strong id="pricing-badge-rol">-</strong></span>
+            <div class="pricing-cards">
+              <!-- PLAN CARD: MONTHLY -->
+              <div class="price-card" id="pcard-mensual" onclick="selectPlanOption('mensual')">
+                <div class="pcard-header">
+                  <h3>Plan Mensual</h3>
+                  <span class="pcard-desc">Acceso flexible mes a mes</span>
+                </div>
+                <div class="pcard-price">
+                  <span class="currency">Q</span>
+                  <span class="amount" id="val-price-mensual">--</span>
+                  <span class="period">/mes</span>
+                </div>
+                <div class="pcard-features">
+                  <ul>
+                    <li><i class="ti ti-check"></i> Renovación manual o automática</li>
+                    <li><i class="ti ti-check"></i> Comprobante electrónico</li>
+                    <li><i class="ti ti-check"></i> QR activo por 30 días</li>
+                  </ul>
+                </div>
+                <div class="pcard-action">
+                  <button class="btn-outline btn-block">Seleccionar Mensual</button>
+                </div>
+              </div>
+
+              <!-- PLAN CARD: ANUAL -->
+              <div class="price-card popular" id="pcard-anual" onclick="selectPlanOption('anual')">
+                <div class="popular-ribbon">Ahorro de 2 Meses</div>
+                <div class="pcard-header">
+                  <h3>Plan Anual</h3>
+                  <span class="pcard-desc">Acceso ilimitado por un año</span>
+                </div>
+                <div class="pcard-price">
+                  <span class="currency">Q</span>
+                  <span class="amount" id="val-price-anual">--</span>
+                  <span class="period">/año</span>
+                </div>
+                <div class="pcard-features">
+                  <ul>
+                    <li><i class="ti ti-check"></i> 12 meses completos de acceso</li>
+                    <li><i class="ti ti-check"></i> Ahorro económico sustancial</li>
+                    <li><i class="ti ti-check"></i> Código QR preferencial</li>
+                  </ul>
+                </div>
+                <div class="pcard-action">
+                  <button class="btn-primary btn-block">Seleccionar Anual</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-subcard">
+            <h3><i class="ti ti-file-text"></i> Resumen de Selección</h3>
+            <table class="summary-table">
+              <tr>
+                <td>Placa del Vehículo</td>
+                <td class="text-right font-mono" id="sum-placa">-</td>
+              </tr>
+              <tr>
+                <td>Tipo de Marbete</td>
+                <td class="text-right" id="sum-tipo-mrb">-</td>
+              </tr>
+              <tr>
+                <td>Vigencia Proyectada</td>
+                <td class="text-right text-info" id="sum-vigencia">-</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total a Cancelar</td>
+                <td class="text-right text-primary" id="sum-total">-</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-outline" onclick="goToPaymentStep1()"><i class="ti ti-arrow-left"></i> Regresar</button>
+            <button class="btn-primary" onclick="goToPaymentStep3()">Continuar al Pago <i class="ti ti-credit-card"></i></button>
+          </div>
+        </div>
+
+        <!-- STEP 3: CREDIT CARD SIMULATED FORM -->
+        <div class="wizard-card glass-card hidden" id="pago-panel-3">
+          <div class="card-header">
+            <h2><i class="ti ti-lock"></i> Pasarela de Pago Integrada</h2>
+            <p>Simulador transaccional seguro con cifrado HTTPS simulado</p>
+          </div>
+
+          <div class="payment-gateway-wrapper">
+            <div class="gateway-logo">
+              <i class="ti ti-shield-lock"></i>
+              <span>Pasarela Académica</span>
+            </div>
+            
+            <div class="gateway-amount-badge">
+              <span>Monto a debitar:</span>
+              <h3 id="gateway-total-to-pay">Q 0.00</h3>
+            </div>
+
+            <form id="form-gateway-payment" onsubmit="processTransaction(event)">
+              <div class="form-group">
+                <label for="card-number">Número de Tarjeta</label>
+                <div class="input-with-icon">
+                  <i class="ti ti-credit-card"></i>
+                  <input type="text" id="card-number" required placeholder="4000 1234 5678 9010" maxlength="19" oninput="formatCardNumber(this)">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="card-holder">Nombre del Titular</label>
+                  <input type="text" id="card-holder" required placeholder="EJ. MARÍA GARCÍA">
+                </div>
+                <div class="form-group col-3">
+                  <label for="card-expiry">Expiración</label>
+                  <input type="text" id="card-expiry" required placeholder="MM/AA" maxlength="5" oninput="formatExpiry(this)">
+                </div>
+                <div class="form-group col-3">
+                  <label for="card-cvv">CVV</label>
+                  <input type="password" id="card-cvv" required placeholder="123" maxlength="3" oninput="formatCVV(this)">
+                </div>
+              </div>
+              <div class="gateway-alert">
+                <i class="ti ti-info-circle"></i>
+                <p>Esta es una pasarela simulada. No ingrese datos reales de tarjetas financieras de producción.</p>
+              </div>
+
+              <div class="form-actions" style="margin-top: 24px; padding: 0;">
+                <button type="button" class="btn-outline" onclick="goToPaymentStep2()"><i class="ti ti-arrow-left"></i> Regresar</button>
+                <button type="submit" class="btn-success">
+                  <i class="ti ti-shield-check"></i> Autorizar Cargo
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- STEP 4: SUCCESS RECEIPT & MOCK PREVIEW -->
+        <div class="wizard-card glass-card hidden" id="pago-panel-4">
+          <div class="receipt-success-banner animate-bounce-in">
+            <div class="success-icon"><i class="ti ti-circle-check"></i></div>
+            <h2>¡Pago Procesado Exitosamente!</h2>
+            <p>El marbete vehicular se ha registrado y está activo de inmediato.</p>
+          </div>
+
+          <div class="receipt-preview-container">
+            <div class="receipt-sheet" id="payment-receipt-sheet">
+              <div class="receipt-header-row">
+                <div class="receipt-header-left">
+                  <h4>Universidad de Acceso Vehicular</h4>
+                  <span>NIT: 839210-K · Exento</span>
+                  <span class="receipt-meta-sub">Depto. de Seguridad y Marbetes</span>
+                </div>
+                <div class="receipt-header-right">
+                  <div class="receipt-number">
+                    <span>Comprobante</span>
+                    <strong id="r-code">MRB-XXXX-XXXX</strong>
+                  </div>
+                  <span class="receipt-date" id="r-date">28 de Mayo, 2026</span>
+                </div>
+              </div>
+
+              <div class="receipt-info-grid">
+                <div class="info-block">
+                  <h5>Propietario</h5>
+                  <p id="r-owner-name">-</p>
+                  <span id="r-owner-email">-</span><br>
+                  <span id="r-owner-cui">DPI: -</span>
+                </div>
+                <div class="info-block">
+                  <h5>Vehículo</h5>
+                  <p id="r-veh-desc">-</p>
+                  <span>Placa: <strong class="font-mono" id="r-veh-placa">-</strong></span><br>
+                  <span>Color: <span id="r-veh-color">-</span></span>
+                </div>
+              </div>
+
+              <table class="receipt-items-table">
+                <thead>
+                  <tr>
+                    <th>Descripción de Servicio</th>
+                    <th>Plan</th>
+                    <th class="text-right">Total Pagado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <strong>Marbete Digital de Acceso Vehicular</strong>
+                      <div class="item-details">
+                        Categoría: <span id="r-item-type">-</span><br>
+                        Vigencia: <span id="r-item-validity" class="text-info">-</span>
+                      </div>
+                    </td>
+                    <td id="r-item-plan" style="text-transform: capitalize;">-</td>
+                    <td class="text-right font-bold text-primary" id="r-item-cost">Q 0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="receipt-footer-row">
+                <div class="receipt-qr-block">
+                  <div class="qr-svg-holder" id="r-qr-svg">
+                    <!-- Loaded dynamically -->
+                    [QR CODE]
+                  </div>
+                  <div class="qr-label">Código QR de Verificación Institucional</div>
+                </div>
+                <div class="receipt-signature-block">
+                  <span class="badge badge-success-soft"><i class="ti ti-shield-check"></i> Transacción Verificada</span>
+                  <div class="transaction-details">
+                    <span>ID Transacción: <strong id="r-txn-id">-</strong></span><br>
+                    <span>Medio de Pago: Tarjeta Visa/Mastercard (Simulada)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions no-print">
+            <button class="btn-outline" onclick="printReceipt()"><i class="ti ti-printer"></i> Imprimir Comprobante</button>
+            <button class="btn-primary" onclick="resetWizard()"><i class="ti ti-plus"></i> Registrar Otro Marbete</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: CONSULTA -->
+      <section id="page-consulta" class="app-page">
+        <div class="glass-card">
+          <div class="card-header">
+            <h2><i class="ti ti-search"></i> Búsqueda General</h2>
+            <p>Consulte la vigencia, historial y registros de auditoría de cualquier placa vehicular</p>
+          </div>
+
+          <div class="search-form-row">
+            <div class="form-group select-inline">
+              <select id="q-plate-type">
+                <option value="">Tipo de Placa</option>
+                <option value="Particular">Particular (P)</option>
+                <option value="Comercial">Comercial (C)</option>
+                <option value="Motocicleta">Motocicleta (M)</option>
+              </select>
+            </div>
+            <div class="form-group search-inline">
+              <input type="text" id="q-plate-number" placeholder="Ingrese el número de placa (Ej: P-001ABC)" style="text-transform: uppercase;" onkeydown="if(event.key==='Enter')executePlateQuery()">
+            </div>
+            <button class="btn-primary search-btn" onclick="executePlateQuery()">
+              <i class="ti ti-search"></i> Buscar Placa
+            </button>
+          </div>
+          <div class="search-suggestions">
+            <span>Sugerencias de prueba (base de datos precargada):</span>
+            <div class="suggestion-chips">
+              <button class="chip" onclick="fillAndSearch('P-001ABC')">P-001ABC (Vigente)</button>
+              <button class="chip" onclick="fillAndSearch('C-002DEF')">C-002DEF (Por vencer)</button>
+              <button class="chip" onclick="fillAndSearch('M-003GHI')">M-003GHI (Vencido)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEARCH RESULTS LAYOUT -->
+        <div id="query-results-panel" class="hidden">
+          <div class="query-results-grid">
+            
+            <!-- LEFT COLUMN: GENERAL AND STATUS CARDS -->
+            <div class="results-main-col">
+              <!-- GENERAL MARBETE CARD -->
+              <div class="glass-card animate-fade-in">
+                <div class="result-header-card">
+                  <div class="plate-badge-container">
+                    <span class="plate-header-type" id="res-tipo-placa">PARTICULAR</span>
+                    <h2 class="plate-number-display font-mono" id="res-placa">P-000XXX</h2>
+                  </div>
+                  <div class="status-badge-container">
+                    <span class="badge" id="res-status-badge">ACTIVO</span>
+                  </div>
+                </div>
+                
+                <div class="results-info-grid">
+                  <div class="info-group">
+                    <label>Propietario</label>
+                    <span class="val" id="res-nombre">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>Rol Institucional</label>
+                    <span class="val" id="res-rol">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>DPI / CUI</label>
+                    <span class="val" id="res-cui">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>Correo Electrónico</label>
+                    <span class="val" id="res-email">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>Vehículo Registrado</label>
+                    <span class="val" id="res-vehiculo">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>Color</label>
+                    <span class="val" id="res-color">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>Código de Marbete</label>
+                    <span class="val text-primary font-bold" id="res-codigo-mrb">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>Plan de Contratación</label>
+                    <span class="val" style="text-transform: capitalize;" id="res-plan">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>Válido Desde</label>
+                    <span class="val" id="res-desde">-</span>
+                  </div>
+                  <div class="info-group">
+                    <label>Válido Hasta</label>
+                    <span class="val" id="res-hasta">-</span>
+                  </div>
+                </div>
+
+                <div class="validity-progress-section">
+                  <div class="progress-labels">
+                    <span>Línea de Vigencia del Acceso</span>
+                    <span id="res-percentage">0%</span>
+                  </div>
+                  <div class="progress-bar-wrapper">
+                    <div class="progress-bar-fill" id="res-progress-bar" style="width: 0%;"></div>
+                  </div>
+                  <p class="progress-days-sub" id="res-days-sub">0 días restantes de vigencia</p>
+                </div>
+
+                <div class="card-footer-actions">
+                  <button class="btn-outline" id="btn-goto-reprint" onclick="triggerReprintFromQuery()">
+                    <i class="ti ti-printer"></i> Ver Factura e Imprimir
+                  </button>
+                </div>
+              </div>
+
+              <!-- PAYMENTS HISTORY -->
+              <div class="glass-card animate-fade-in" style="margin-top: 16px;">
+                <div class="card-header">
+                  <h2><i class="ti ti-report-money"></i> Historial de Transacciones</h2>
+                  <p>Registro histórico de cobros mensuales y anuales asociados a este vehículo</p>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID Transacción</th>
+                      <th>Fecha de Pago</th>
+                      <th>Plan</th>
+                      <th>Monto</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="res-payments-table">
+                    <tr>
+                      <td colspan="5" class="text-center text-muted">No se registran transacciones.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: ACCESS LOGS AND PHOTO -->
+            <div class="results-side-col">
+              <!-- VEHICLE MOCK UP FRAME -->
+              <div class="glass-card animate-fade-in">
+                <div class="card-header">
+                  <h2><i class="ti ti-camera"></i> Foto del Registro Vehicular</h2>
+                  <p>Imagen asociada a la base de datos de control</p>
+                </div>
+                <div class="vehicle-photo-placeholder" id="vehicle-photo-box">
+                  <!-- Image will be generated or placed dynamically -->
+                  <i class="ti ti-car-garage"></i>
+                  <span>Toyota Corolla</span>
+                </div>
+              </div>
+
+              <!-- AUDIT LOGS FOR THIS PLATE -->
+              <div class="glass-card animate-fade-in" style="margin-top: 16px;">
+                <div class="card-header">
+                  <h2><i class="ti ti-history"></i> Registros de Entrada/Salida</h2>
+                  <p>Trazabilidad histórica de escaneos y validaciones en garitas</p>
+                </div>
+                <div class="audit-timeline compact" id="res-audit-timeline">
+                  <div class="empty-state">
+                    <i class="ti ti-database-off"></i>
+                    <p>No hay logs cargados.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SEARCH EMPTY STATE -->
+        <div id="query-empty-panel" class="glass-card text-center" style="padding: 60px 20px;">
+          <div class="empty-large-icon"><i class="ti ti-search"></i></div>
+          <h3>Esperando Búsqueda...</h3>
+          <p>Ingrese un número de placa arriba para interrogar la base de datos del sistema de control vehicular.</p>
+        </div>
+      </section>
+
+      <!-- PAGE: REIMPRESION -->
+      <section id="page-reimpresion" class="app-page">
+        <div class="glass-card no-print">
+          <div class="card-header">
+            <h2><i class="ti ti-printer"></i> Búsqueda para Reimpresión</h2>
+            <p>Busque el vehículo por placa para generar la factura electrónica en formato imprimible oficial</p>
+          </div>
+
+          <div class="search-form-row">
+            <input type="text" id="r-plate-search" placeholder="Ingrese el número de placa (Ej: P-001ABC)" style="text-transform: uppercase;" onkeydown="if(event.key==='Enter')executeReprintQuery()">
+            <button class="btn-primary search-btn" onclick="executeReprintQuery()">
+              <i class="ti ti-file-text"></i> Generar Vista de Factura
+            </button>
+          </div>
+          
+          <div class="search-suggestions">
+            <span>Sugerencias rápidas:</span>
+            <div class="suggestion-chips">
+              <button class="chip" onclick="fillAndSearchReprint('P-001ABC')">P-001ABC (Carlos Méndez)</button>
+              <button class="chip" onclick="fillAndSearchReprint('C-002DEF')">C-002DEF (Ana Pérez)</button>
+              <button class="chip" onclick="fillAndSearchReprint('M-003GHI')">M-003GHI (Roberto Díaz)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPRINT CARD PRESENTATION -->
+        <div id="reprint-results-panel" class="hidden">
+          <div class="reprint-action-bar no-print">
+            <button class="btn-primary" onclick="window.print()"><i class="ti ti-printer"></i> Imprimir Factura</button>
+            <button class="btn-outline" onclick="window.print()"><i class="ti ti-download"></i> Guardar como PDF</button>
+          </div>
+
+          <div class="reprint-sheet-wrapper">
+            <div class="factura-sheet" id="invoice-sheet">
+              <!-- Header -->
+              <div class="factura-header">
+                <div class="factura-title-block">
+                  <h2>SISTEMA DE CONTROL DE ACCESO VEHICULAR</h2>
+                  <h3>UNIVERSIDAD DE MARBETES - DEPARTAMENTO DE SEGURIDAD</h3>
+                  <p>Factura Oficial de Derecho de Marbete Digital</p>
+                </div>
+                <div class="factura-number-block">
+                  <span>FACTURA ELECTRÓNICA</span>
+                  <strong id="i-invoice-number">FAC-2026-XXXX</strong>
+                  <span class="factura-date" id="i-invoice-date">Fecha: --/--/----</span>
+                </div>
+              </div>
+
+              <!-- Information Grid -->
+              <div class="factura-grid">
+                <div class="factura-section">
+                  <h4><i class="ti ti-user"></i> DATOS DEL PROPIETARIO</h4>
+                  <table class="factura-details-table">
+                    <tr><td>Nombre completo:</td><td id="i-owner-name">-</td></tr>
+                    <tr><td>CUI / DPI:</td><td id="i-owner-cui">-</td></tr>
+                    <tr><td>Rol institucional:</td><td id="i-owner-rol">-</td></tr>
+                    <tr><td>Correo electrónico:</td><td id="i-owner-email">-</td></tr>
+                  </table>
+                </div>
+
+                <div class="factura-section">
+                  <h4><i class="ti ti-car"></i> DATOS DEL VEHÍCULO</h4>
+                  <table class="factura-details-table">
+                    <tr><td>Número de placa:</td><td id="i-veh-placa" class="font-mono font-bold">-</td></tr>
+                    <tr><td>Tipo de placa:</td><td id="i-veh-tipo-placa">-</td></tr>
+                    <tr><td>Vehículo (Marca/Mod):</td><td id="i-veh-desc">-</td></tr>
+                    <tr><td>Color registrado:</td><td id="i-veh-color">-</td></tr>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Marbete Grid -->
+              <div class="factura-section marbete-box-section">
+                <h4><i class="ti ti-shield-check"></i> ESPECIFICACIÓN DEL MARBETE DE ACCESO HABILITADO</h4>
+                <div class="factura-marbete-row">
+                  <div class="marbete-left">
+                    <table class="factura-details-table text-large">
+                      <tr><td>Código de Marbete:</td><td><strong class="text-primary" id="i-mrb-code">-</strong></td></tr>
+                      <tr><td>Tipo de Acceso:</td><td id="i-mrb-type">-</td></tr>
+                      <tr><td>Plan Contratado:</td><td style="text-transform: capitalize;" id="i-mrb-plan">-</td></tr>
+                      <tr><td>Fecha de Emisión:</td><td id="i-mrb-desde">-</td></tr>
+                      <tr><td>Fecha de Expiración:</td><td id="i-mrb-hasta">-</td></tr>
+                      <tr><td>Estado de Acceso:</td><td><span class="badge" id="i-mrb-status">-</span></td></tr>
+                    </table>
+                  </div>
+                  <div class="marbete-right qr-factura-block">
+                    <div class="qr-svg-holder large" id="i-qr-svg">
+                      <!-- Dynamically Loaded -->
+                      [QR]
+                    </div>
+                    <span class="qr-sub">Lector de Control en Garita</span>
+                    <span class="qr-url-desc" id="i-qr-url">http://...</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Line items / Cost breakdown -->
+              <table class="factura-items-table">
+                <thead>
+                  <tr>
+                    <th>CÓDIGO</th>
+                    <th>CONCEPTO / DESCRIPCIÓN</th>
+                    <th class="text-right">TOTAL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="font-mono" id="i-item-code">SERV-MARB-01</td>
+                    <td>
+                      <strong>Derecho de Acceso Vehicular Institucional - Ciclo 2026</strong>
+                      <div class="factura-item-sub">Habilitación de talanqueras electrónicas automáticas para el vehículo especificado en la presente factura.</div>
+                    </td>
+                    <td class="text-right font-bold" id="i-item-total">Q 0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="factura-footer-row">
+                <div class="factura-conditions">
+                  <h5>Condiciones y Certificación</h5>
+                  <p>1. Este comprobante certifica el pago correspondiente al marbete digital habilitado en la base de datos.</p>
+                  <p>2. El código QR contiene la firma digital criptográfica de verificación instantánea para guardias de garita.</p>
+                  <p>3. El marbete es intransferible y está asociado únicamente a la placa descrita.</p>
+                </div>
+                <div class="factura-total-box">
+                  <span>TOTAL FACTURADO</span>
+                  <h3 id="i-grand-total">Q 0.00</h3>
+                  <span class="badge badge-success-soft"><i class="ti ti-circle-check"></i> CANCELADO</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPRINT EMPTY STATE -->
+        <div id="reprint-empty-panel" class="glass-card text-center" style="padding: 60px 20px;">
+          <div class="empty-large-icon"><i class="ti ti-printer"></i></div>
+          <h3>Esperando Placa Vehicular...</h3>
+          <p>Ingrese un número de placa arriba para generar su correspondiente factura oficial con código QR.</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FLOATING INSPECTOR DRAWER BUTTONS (WOW FACTOR FOR ACADEMIC DEMO) -->
+    <div class="logs-drawers-container no-print">
+      <!-- BUTTONS TO TOGGLE THE DRAWERS -->
+      <div class="drawer-trigger-buttons">
+        <button class="btn-drawer" id="btn-trigger-emails" onclick="toggleDrawer('emails')">
+          <i class="ti ti-mail"></i> Buzón de Correos Mock (<span id="count-emails">0</span>)
+        </button>
+        <button class="btn-drawer" id="btn-trigger-webhooks" onclick="toggleDrawer('webhooks')">
+          <i class="ti ti-webhook"></i> Logs de Webhooks (<span id="count-webhooks">0</span>)
+        </button>
+      </div>
+
+      <!-- DRAWER PANEL: EMAILS -->
+      <div class="drawer-panel" id="drawer-emails">
+        <div class="drawer-header">
+          <h3><i class="ti ti-mail-opened"></i> Correos Electrónicos Enviados (Mock)</h3>
+          <span class="drawer-desc">Buzón local de notificaciones de marbetes emitidos al usuario</span>
+          <button class="btn-close-drawer" onclick="closeDrawer('emails')"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="drawer-content" id="drawer-emails-content">
+          <div class="empty-state">
+            <i class="ti ti-mail-forward"></i>
+            <p>No se han registrado correos enviados. Complete un pago para enviar una notificación.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DRAWER PANEL: WEBHOOKS -->
+      <div class="drawer-panel" id="drawer-webhooks">
+        <div class="drawer-header">
+          <h3><i class="ti ti-webhook"></i> Notificaciones de Webhooks Transaccionales</h3>
+          <span class="drawer-desc">Registro de Webhooks HTTP POST en tiempo real emitidos por la pasarela de pagos</span>
+          <button class="btn-close-drawer" onclick="closeDrawer('webhooks')"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="drawer-content" id="drawer-webhooks-content">
+          <div class="empty-state">
+            <i class="ti ti-webhook-off"></i>
+            <p>No se registran eventos de webhooks emitidos. Complete un pago para disparar notificaciones en tiempo real.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

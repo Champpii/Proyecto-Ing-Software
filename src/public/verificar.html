@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificador Oficial de Marbetes Vehiculares - Universidad</title>
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+  
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  
+  <!-- Premium CSS stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <style>
+    /* Specific styles for the public verification page on mobile */
+    body {
+      background: radial-gradient(circle at top left, #0f172a 0%, #1e1b4b 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    
+    .verify-container {
+      max-width: 480px;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      text-align: center;
+    }
+    
+    .verify-badge-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 40px;
+      transition: all 0.5s ease;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .v-loading {
+      background: rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    
+    .v-authorized {
+      background: #10b981;
+      color: #ffffff;
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+    }
+    
+    .v-warning {
+      background: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+    }
+    
+    .v-denied {
+      background: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+    }
+    
+    .verify-status-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    
+    .verify-status-subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+    
+    .verify-details-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    
+    .v-field {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 14px;
+    }
+    
+    .v-field:last-child {
+      border-bottom: none;
+    }
+    
+    .v-field .label {
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    .v-field .value {
+      font-weight: 600;
+      color: #f1f5f9;
+      text-align: right;
+    }
+    
+    .v-field .value.plate {
+      font-family: 'Fira Code', monospace;
+      letter-spacing: 0.5px;
+      color: #60a5fa;
+    }
+    
+    .v-field .value.date-red {
+      color: #f87171;
+    }
+    
+    .v-field .value.date-green {
+      color: #34d399;
+    }
+
+    .v-footer {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 20px;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="verify-container">
+    
+    <!-- HEADER -->
+    <div class="verify-header" style="margin-bottom: 24px;">
+      <h3 style="font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Universidad UV - Garitas</h3>
+      <h4 style="font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: #e2e8f0;">Sistema de Validación Vehicular</h4>
+    </div>
+
+    <!-- MAIN STATUS BLOCK -->
+    <div id="status-card">
+      <div class="verify-badge-icon v-loading" id="status-icon">
+        <i class="ti ti-loader-2" style="animation: spin 1s infinite linear;"></i>
+      </div>
+      <h2 class="verify-status-title" id="status-title">Conectando...</h2>
+      <p class="verify-status-subtitle" id="status-subtitle">Consultando el token en la base de datos de control</p>
+    </div>
+
+    <!-- DETAILS BOX (HIDDEN DURING LOADING) -->
+    <div class="verify-details-box hidden" id="details-box">
+      <div class="v-field">
+        <span class="label">Propietario</span>
+        <span class="value" id="val-owner">-</span>
+      </div>
+      <div class="v-field">
+        <span class="label">Rol Institucional</span>
+        <span class="value" id="val-rol">-</span>
+      </div>
+      <div class="v-field">
+        <span class="label">Placa Vehicular</span>
+        <span class="value plate" id="val-placa">-</span>
+      </div>
+      <div class="v-field">
+        <span class="label">Vehículo</span>
+        <span class="value" id="val-vehiculo">-</span>
+      </div>
+      <div class="v-field">
+        <span class="label">Código Marbete</span>
+        <span class="value" style="color: #818cf8;" id="val-codigo">-</span>
+      </div>
+      <div class="v-field">
+        <span class="label">Válido Hasta</span>
+        <span class="value" id="val-hasta">-</span>
+      </div>
+      <div class="v-field">
+        <span class="label">Estado de Cuenta</span>
+        <span class="value" id="val-estado">-</span>
+      </div>
+    </div>
+
+    <div class="verify-action no-print">
+      <a href="index.html" class="btn-outline btn-block" style="display: inline-block; padding: 10px; border-radius: 8px; font-size: 13px; text-decoration: none; color: #94a3b8; border-color: rgba(255,255,255,0.1);">
+        <i class="ti ti-arrow-left"></i> Ir al Portal Administrativo
+      </a>
+    </div>
+
+    <div class="v-footer">
+      <span>Departamento de Control de Accesos Vehiculares © 2026</span><br>
+      <span style="font-family: monospace; opacity: 0.5; margin-top: 4px; display: inline-block;" id="val-token">Token: -</span>
+    </div>
+
+  </div>
+
+  <script>
+    // READ TOKEN FROM QUERY PARAMS
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    document.getElementById('val-token').innerText = `Token: ${token || 'Ninguno'}`;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const statusIcon = document.getElementById('status-icon');
+      const statusTitle = document.getElementById('status-title');
+      const statusSubtitle = document.getElementById('status-subtitle');
+      const detailsBox = document.getElementById('details-box');
+
+      if (!token) {
+        // Show invalid token immediately
+        statusIcon.className = 'verify-badge-icon v-denied';
+        statusIcon.innerHTML = '<i class="ti ti-circle-x"></i>';
+        statusTitle.innerText = 'Token Faltante';
+        statusSubtitle.innerText = 'No se proporcionó ningún token de seguridad para la validación.';
+        return;
+      }
+
+      try {
+        // Fetch verification state from REST API
+        const res = await fetch(`/api/marbetes/verificar/${token}`);
+        const data = await res.json();
+
+        if (res.status === 404 || !data.success) {
+          statusIcon.className = 'verify-badge-icon v-denied';
+          statusIcon.innerHTML = '<i class="ti ti-circle-x"></i>';
+          statusTitle.innerText = 'Acceso Denegado';
+          statusSubtitle.innerText = data.message || 'Código de marbete no registrado o falsificado.';
+          return;
+        }
+
+        // Token found, read variables
+        const { estado, diasRestantes, marbete, vehicle, owner } = data;
+        
+        // Populate fields
+        document.getElementById('val-owner').innerText = owner.nombre;
+        document.getElementById('val-rol').innerText = owner.rol;
+        document.getElementById('val-placa').innerText = vehicle.placa;
+        document.getElementById('val-vehiculo').innerText = `${vehicle.marca} ${vehicle.modelo} (${vehicle.color})`;
+        document.getElementById('val-codigo').innerText = marbete.codigo;
+        document.getElementById('val-hasta').innerText = formatDateStr(new Date(marbete.hasta));
+        
+        // Show Details panel
+        detailsBox.classList.remove('hidden');
+
+        const dateVal = document.getElementById('val-hasta');
+        const stateVal = document.getElementById('val-estado');
+
+        // Style based on validity status
+        if (estado === 'Vencido') {
+          statusIcon.className = 'verify-badge-icon v-denied';
+          statusIcon.innerHTML = '<i class="ti ti-shield-x"></i>';
+          statusTitle.innerText = 'Acceso Denegado';
+          statusTitle.style.color = '#ef4444';
+          statusSubtitle.innerText = `Marbete vencido hace ${Math.abs(diasRestantes)} días (Fecha límite: ${marbete.hasta})`;
+          
+          dateVal.className = 'value date-red';
+          stateVal.innerHTML = '<span class="badge badge-danger">VENCIDO / BLOQUEADO</span>';
+        } 
+        else if (estado === 'Por vencer') {
+          statusIcon.className = 'verify-badge-icon v-warning';
+          statusIcon.innerHTML = '<i class="ti ti-shield-alert"></i>';
+          statusTitle.innerText = 'Acceso Autorizado';
+          statusTitle.style.color = '#f59e0b';
+          statusSubtitle.innerText = `Marbete activo - ¡Alerta! Vence en ${diasRestantes} días`;
+          
+          dateVal.className = 'value date-red';
+          stateVal.innerHTML = '<span class="badge badge-warning">POR VENCER (Renovar)</span>';
+        } 
+        else {
+          // Vigente
+          statusIcon.className = 'verify-badge-icon v-authorized';
+          statusIcon.innerHTML = '<i class="ti ti-shield-check"></i>';
+          statusTitle.innerText = 'Acceso Autorizado';
+          statusTitle.style.color = '#10b981';
+          statusSubtitle.innerText = `Marbete vigente - ${diasRestantes} días restantes de servicio`;
+          
+          dateVal.className = 'value date-green';
+          stateVal.innerHTML = '<span class="badge badge-success">VIGENTE / ACTIVO</span>';
+        }
+
+      } catch (err) {
+        console.error('Error fetching verification payload:', err);
+        statusIcon.className = 'verify-badge-icon v-denied';
+        statusIcon.innerHTML = '<i class="ti ti-wifi-off"></i>';
+        statusTitle.innerText = 'Error de Enlace';
+        statusSubtitle.innerText = 'No se pudo conectar con el servidor central de control de accesos.';
+      }
+    });
+
+    // Formatting date string helper
+    function formatDateStr(date) {
+      return date.toLocaleDateString('es-GT', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+    }
+  </script>
+</body>
+</html>
