@@ -1,0 +1,718 @@
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+  .app{min-height:600px}
+  .hidden{display:none!important}
+
+  /* NAV */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);position:sticky;top:0;z-index:100}
+  .nav-brand{display:flex;align-items:center;gap:10px}
+  .nav-logo{width:34px;height:34px;background:#185FA5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:500;font-size:13px}
+  .nav-title{font-size:14px;font-weight:500}
+  .nav-sub{font-size:11px;color:var(--color-text-secondary)}
+  .nav-tabs{display:flex;gap:4px}
+  .nav-tab{padding:6px 14px;border-radius:var(--border-radius-md);font-size:13px;border:0.5px solid transparent;cursor:pointer;color:var(--color-text-secondary);background:transparent;transition:all .15s}
+  .nav-tab:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+  .nav-tab.active{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-secondary)}
+  .nav-user{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-secondary)}
+  .avatar{width:28px;height:28px;border-radius:50%;background:#B5D4F4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#0C447C}
+
+  /* PAGES */
+  .page{padding:24px 20px;display:none}
+  .page.active{display:block}
+
+  /* LOGIN */
+  .login-wrap{max-width:360px;margin:60px auto;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:32px}
+  .login-logo{width:48px;height:48px;background:#185FA5;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;margin:0 auto 16px}
+  .login-wrap h2{text-align:center;font-size:18px;font-weight:500;margin-bottom:4px}
+  .login-wrap p{text-align:center;font-size:13px;color:var(--color-text-secondary);margin-bottom:24px}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-size:12px;color:var(--color-text-secondary);margin-bottom:5px;font-weight:500}
+  .form-group input,.form-group select,.form-group textarea{width:100%}
+  .btn-primary{width:100%;padding:9px 16px;background:#185FA5;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s}
+  .btn-primary:hover{background:#0C447C}
+  .btn-outline{padding:8px 16px;background:transparent;color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;transition:all .15s}
+  .btn-outline:hover{background:var(--color-background-secondary)}
+  .hint{font-size:11px;color:var(--color-text-tertiary);text-align:center;margin-top:12px}
+
+  /* DASHBOARD */
+  .page-header{margin-bottom:24px}
+  .page-header h2{font-size:20px;font-weight:500}
+  .page-header p{font-size:13px;color:var(--color-text-secondary);margin-top:3px}
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+  .stat-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px}
+  .stat-card .label{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
+  .stat-card .value{font-size:22px;font-weight:500}
+  .stat-card .sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+  .modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+  .module-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px;cursor:pointer;transition:all .15s}
+  .module-card:hover{border-color:var(--color-border-primary);background:var(--color-background-secondary)}
+  .module-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px}
+  .module-card h3{font-size:15px;font-weight:500;margin-bottom:5px}
+  .module-card p{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+  .ic-pay{background:#E6F1FB;color:#185FA5}
+  .ic-query{background:#EAF3DE;color:#3B6D11}
+  .ic-print{background:#FAEEDA;color:#854F0B}
+
+  /* STEPS */
+  .steps-bar{display:flex;gap:0;margin-bottom:28px}
+  .step-item{flex:1;display:flex;align-items:center}
+  .step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;border:1.5px solid var(--color-border-secondary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+  .step-dot.done{background:#185FA5;border-color:#185FA5;color:#fff}
+  .step-dot.active{border-color:#185FA5;color:#185FA5}
+  .step-label{font-size:11px;color:var(--color-text-secondary);margin-left:7px}
+  .step-label.active{color:var(--color-text-primary);font-weight:500}
+  .step-line{flex:1;height:1px;background:var(--color-border-tertiary);margin:0 8px}
+
+  /* SECTION CARD */
+  .section-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px;margin-bottom:16px}
+  .section-card h3{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--color-text-secondary)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .form-group input,.form-group select{padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary)}
+  .form-group input:focus,.form-group select:focus{outline:none;border-color:#185FA5}
+
+  /* MARBETE TYPES */
+  .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .type-card{border:1.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px 10px;cursor:pointer;transition:all .15s;text-align:center}
+  .type-card:hover{border-color:#185FA5}
+  .type-card.selected{border-color:#185FA5;background:#E6F1FB}
+  .type-card .type-icon{font-size:20px;margin-bottom:6px}
+  .type-card .type-name{font-size:13px;font-weight:500}
+  .type-card .type-price{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+
+  /* PLAN TOGGLE */
+  .plan-toggle{display:flex;gap:8px;margin-bottom:16px}
+  .plan-btn{flex:1;padding:10px;border:1.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;text-align:center;background:transparent;transition:all .15s}
+  .plan-btn:hover{border-color:#185FA5}
+  .plan-btn.selected{border-color:#185FA5;background:#E6F1FB}
+  .plan-btn .plan-label{font-size:13px;font-weight:500}
+  .plan-btn .plan-price{font-size:20px;font-weight:500;color:#185FA5;margin:4px 0}
+  .plan-btn .plan-desc{font-size:11px;color:var(--color-text-secondary)}
+  .plan-btn.selected .plan-badge{display:inline-block;background:#185FA5;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-top:4px}
+  .plan-badge{display:none}
+
+  /* RESUMEN PAGO */
+  .summary-table{width:100%;font-size:13px}
+  .summary-table td{padding:6px 0;vertical-align:top}
+  .summary-table td:last-child{text-align:right;font-weight:500}
+  .summary-divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:8px 0}
+  .total-row td{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+
+  /* BADGE STATUS */
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+  .badge-success{background:#EAF3DE;color:#3B6D11}
+  .badge-warning{background:#FAEEDA;color:#854F0B}
+  .badge-danger{background:#FCEBEB;color:#A32D2D}
+  .badge-info{background:#E6F1FB;color:#185FA5}
+
+  /* MOCK PAYMENT */
+  .payment-box{border:1.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:24px;text-align:center;margin-bottom:16px}
+  .payment-box .pay-icon{font-size:32px;margin-bottom:8px;color:#185FA5}
+  .payment-box h3{font-size:16px;font-weight:500;margin-bottom:4px}
+  .payment-box p{font-size:13px;color:var(--color-text-secondary);margin-bottom:16px}
+  .card-input-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:12px}
+
+  /* COMPROBANTE */
+  .receipt{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:24px}
+  .receipt-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .receipt-logo{font-size:13px;font-weight:500}
+  .receipt-logo span{display:block;font-size:11px;color:var(--color-text-secondary);font-weight:400}
+  .receipt-num{text-align:right;font-size:12px;color:var(--color-text-secondary)}
+  .receipt-num strong{display:block;font-size:15px;color:var(--color-text-primary);font-weight:500}
+  .receipt-qr{width:64px;height:64px;background:var(--color-background-secondary);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--color-text-secondary);text-align:center}
+  .receipt-body td{padding:5px 0;font-size:13px;vertical-align:top}
+  .receipt-body td:first-child{color:var(--color-text-secondary);width:140px}
+  .receipt-footer{margin-top:16px;padding-top:12px;border-top:0.5px solid var(--color-border-tertiary);display:flex;justify-content:space-between;align-items:center}
+  .actions-row{display:flex;gap:8px;margin-top:16px}
+
+  /* CONSULTA */
+  .search-box{display:flex;gap:8px;margin-bottom:20px}
+  .search-box input{flex:1;padding:9px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:14px;background:var(--color-background-primary);color:var(--color-text-primary)}
+  .search-box input:focus{outline:none;border-color:#185FA5}
+  .result-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+  .result-header{padding:16px 20px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;justify-content:space-between;align-items:center}
+  .result-plate{font-size:22px;font-weight:500;letter-spacing:2px;font-family:var(--font-mono)}
+  .result-body{padding:20px}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+  .info-item .ilabel{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+  .info-item .ivalue{font-size:14px;font-weight:500}
+  .hist-table{width:100%;font-size:12px;border-collapse:collapse}
+  .hist-table th{text-align:left;padding:6px 8px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+  .hist-table td{padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .hist-table tr:last-child td{border-bottom:none}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--color-text-secondary);font-size:14px}
+  .empty-icon{font-size:32px;margin-bottom:8px;color:var(--color-text-tertiary)}
+
+  /* REIMPRESION */
+  .factura{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-top:16px}
+  .factura-head{background:#185FA5;color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center}
+  .factura-head h3{font-size:16px;font-weight:500}
+  .factura-head span{font-size:12px;opacity:.8}
+  .factura-body{padding:20px 24px}
+  .factura-section{margin-bottom:16px}
+  .factura-section-title{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .factura-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .factura-row:last-child{border-bottom:none}
+  .factura-total{background:var(--color-background-secondary);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;border-top:0.5px solid var(--color-border-tertiary)}
+  .factura-total span{font-size:14px;font-weight:500}
+  .factura-total .amount{font-size:20px;font-weight:500;color:#185FA5}
+  .qr-block{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .qr-block .qr-label{font-size:10px;color:var(--color-text-secondary)}
+
+  /* VIGENCIA BAR */
+  .vigencia-bar{background:var(--color-background-secondary);border-radius:4px;height:6px;margin-top:8px;overflow:hidden}
+  .vigencia-fill{height:100%;border-radius:4px;background:#185FA5}
+
+  /* BACK BTN */
+  .back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;margin-bottom:16px;padding:4px 0}
+  .back-btn:hover{color:var(--color-text-primary)}
+
+  @media print{
+    .no-print{display:none!important}
+    .factura{border:1px solid #ccc}
+  }
+</style>
+
+<h2 class="sr-only">Sistema de Control de Acceso Vehicular Universitario — Demo interactiva con módulos de Pago, Consulta y Reimpresión de Marbetes</h2>
+
+<div class="app" id="app">
+
+  <!-- LOGIN -->
+  <div id="page-login" class="page active" style="padding:0">
+    <div class="login-wrap">
+      <div class="login-logo"><i class="ti ti-car" aria-hidden="true"></i></div>
+      <h2>Portal de Marbetes</h2>
+      <p>Sistema de Control de Acceso Vehicular</p>
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="login-user" value="admin@universidad.edu.gt" placeholder="usuario@universidad.edu.gt">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" value="••••••••" placeholder="Contraseña">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Ingresar al sistema</button>
+      <p class="hint">Demo académica — credenciales prellenadas</p>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT (after login) -->
+  <div id="main-layout" class="hidden">
+    <nav class="nav no-print">
+      <div class="nav-brand">
+        <div class="nav-logo">UV</div>
+        <div>
+          <div class="nav-title">Portal de Marbetes</div>
+          <div class="nav-sub">Control de Acceso Vehicular</div>
+        </div>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Inicio</button>
+        <button class="nav-tab" onclick="showPage('pago',this)"><i class="ti ti-credit-card" aria-hidden="true"></i> Pago</button>
+        <button class="nav-tab" onclick="showPage('consulta',this)"><i class="ti ti-search" aria-hidden="true"></i> Consulta</button>
+        <button class="nav-tab" onclick="showPage('reimpresion',this)"><i class="ti ti-printer" aria-hidden="true"></i> Reimpresión</button>
+      </div>
+      <div class="nav-user">
+        <div class="avatar">AU</div>
+        <span>Admin</span>
+        <button class="btn-outline" style="padding:4px 10px;font-size:12px" onclick="doLogout()">Salir</button>
+      </div>
+    </nav>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h2>Bienvenido, Administrador</h2>
+        <p>Gestión de marbetes vehiculares — ciclo 2025</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="label">Marbetes vigentes</div><div class="value">142</div><div class="sub">↑ 8 este mes</div></div>
+        <div class="stat-card"><div class="label">Por vencer</div><div class="value" style="color:#854F0B">17</div><div class="sub">En los próximos 7 días</div></div>
+        <div class="stat-card"><div class="label">Vencidos</div><div class="value" style="color:#A32D2D">5</div><div class="sub">Sin renovación</div></div>
+        <div class="stat-card"><div class="label">Ingresos del mes</div><div class="value">Q4,850</div><div class="sub">Mayo 2025</div></div>
+      </div>
+      <div class="modules-grid">
+        <div class="module-card" onclick="gotoModule('pago')">
+          <div class="module-icon ic-pay"><i class="ti ti-credit-card" aria-hidden="true"></i></div>
+          <h3>Pago de Marbete</h3>
+          <p>Registrar vehículo y procesar pago mensual o anual de marbete de acceso.</p>
+        </div>
+        <div class="module-card" onclick="gotoModule('consulta')">
+          <div class="module-icon ic-query"><i class="ti ti-search" aria-hidden="true"></i></div>
+          <h3>Consulta de Marbete</h3>
+          <p>Buscar por número de placa para ver estado, vigencia e historial de pagos.</p>
+        </div>
+        <div class="module-card" onclick="gotoModule('reimpresion')">
+          <div class="module-icon ic-print"><i class="ti ti-printer" aria-hidden="true"></i></div>
+          <h3>Reimpresión</h3>
+          <p>Generar vista de factura con código QR para verificación e impresión.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGO -->
+    <div id="page-pago" class="page">
+      <div id="pago-step1">
+        <div class="page-header">
+          <h2><i class="ti ti-credit-card" aria-hidden="true" style="color:#185FA5"></i> Pago de Marbete</h2>
+          <p>Complete los datos del vehículo y seleccione el plan de pago</p>
+        </div>
+        <div class="steps-bar">
+          <div class="step-item"><div class="step-dot active">1</div><span class="step-label active">Datos del vehículo</span></div>
+          <div class="step-line"></div>
+          <div class="step-item"><div class="step-dot">2</div><span class="step-label">Tipo y plan</span></div>
+          <div class="step-line"></div>
+          <div class="step-item"><div class="step-dot">3</div><span class="step-label">Pago</span></div>
+        </div>
+        <div class="section-card">
+          <h3>Datos del propietario</h3>
+          <div class="row2">
+            <div class="form-group"><label>Nombre completo</label><input type="text" id="p-nombre" placeholder="Ej. María García López"></div>
+            <div class="form-group"><label>CUI / DPI</label><input type="text" id="p-cui" placeholder="0000 00000 0000"></div>
+          </div>
+          <div class="row2">
+            <div class="form-group"><label>Correo electrónico</label><input type="email" id="p-email" placeholder="correo@universidad.edu.gt"></div>
+            <div class="form-group"><label>Teléfono</label><input type="text" id="p-tel" placeholder="5555-0000"></div>
+          </div>
+          <div class="form-group"><label>Rol en la institución</label>
+            <select id="p-rol">
+              <option value="">Seleccionar...</option>
+              <option>Estudiante</option>
+              <option>Docente</option>
+              <option>Administrativo</option>
+            </select>
+          </div>
+        </div>
+        <div class="section-card">
+          <h3>Datos del vehículo</h3>
+          <div class="row3">
+            <div class="form-group"><label>Tipo de placa</label>
+              <select id="p-tipo-placa">
+                <option value="">Tipo...</option>
+                <option>Particular</option>
+                <option>Comercial</option>
+                <option>Motocicleta</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Número de placa</label><input type="text" id="p-placa" placeholder="P-123ABC" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Año del vehículo</label><input type="text" id="p-anio" placeholder="2020"></div>
+          </div>
+          <div class="row2">
+            <div class="form-group"><label>Marca</label><input type="text" id="p-marca" placeholder="Toyota"></div>
+            <div class="form-group"><label>Modelo</label><input type="text" id="p-modelo" placeholder="Corolla"></div>
+          </div>
+          <div class="form-group"><label>Color</label><input type="text" id="p-color" placeholder="Blanco"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn-primary" style="width:auto;padding:9px 24px" onclick="pagoStep2()">Continuar <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+        </div>
+      </div>
+
+      <div id="pago-step2" class="hidden">
+        <div class="page-header">
+          <h2><i class="ti ti-credit-card" aria-hidden="true" style="color:#185FA5"></i> Pago de Marbete</h2>
+        </div>
+        <div class="steps-bar">
+          <div class="step-item"><div class="step-dot done"><i class="ti ti-check" aria-hidden="true"></i></div><span class="step-label">Datos del vehículo</span></div>
+          <div class="step-line"></div>
+          <div class="step-item"><div class="step-dot active">2</div><span class="step-label active">Tipo y plan</span></div>
+          <div class="step-line"></div>
+          <div class="step-item"><div class="step-dot">3</div><span class="step-label">Pago</span></div>
+        </div>
+        <div class="section-card">
+          <h3>Seleccionar tipo de marbete</h3>
+          <div class="type-grid">
+            <div class="type-card" onclick="selectType(this,'Estudiante',50,500)">
+              <div class="type-icon"><i class="ti ti-school" aria-hidden="true" style="font-size:22px;color:#185FA5"></i></div>
+              <div class="type-name">Estudiante</div>
+              <div class="type-price">Q50/mes · Q500/año</div>
+            </div>
+            <div class="type-card" onclick="selectType(this,'Docente',75,750)">
+              <div class="type-icon"><i class="ti ti-user-check" aria-hidden="true" style="font-size:22px;color:#3B6D11"></i></div>
+              <div class="type-name">Docente</div>
+              <div class="type-price">Q75/mes · Q750/año</div>
+            </div>
+            <div class="type-card" onclick="selectType(this,'Administrativo',75,750)">
+              <div class="type-icon"><i class="ti ti-building" aria-hidden="true" style="font-size:22px;color:#854F0B"></i></div>
+              <div class="type-name">Administrativo</div>
+              <div class="type-price">Q75/mes · Q750/año</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-card">
+          <h3>Seleccionar plan</h3>
+          <div class="plan-toggle">
+            <button class="plan-btn selected" id="plan-mensual" onclick="selectPlan('mensual')">
+              <div class="plan-label">Plan Mensual</div>
+              <div class="plan-price" id="price-mensual">Q50</div>
+              <div class="plan-desc">Renovación cada mes</div>
+              <span class="plan-badge">Seleccionado</span>
+            </button>
+            <button class="plan-btn" id="plan-anual" onclick="selectPlan('anual')">
+              <div class="plan-label">Plan Anual</div>
+              <div class="plan-price" id="price-anual">Q500</div>
+              <div class="plan-desc">2 meses de ahorro</div>
+              <span class="plan-badge">Seleccionado</span>
+            </button>
+          </div>
+        </div>
+        <div class="section-card">
+          <h3>Resumen</h3>
+          <table class="summary-table">
+            <tr><td style="color:var(--color-text-secondary)">Placa</td><td id="sum-placa">—</td></tr>
+            <tr><td style="color:var(--color-text-secondary)">Tipo de marbete</td><td id="sum-tipo">—</td></tr>
+            <tr><td style="color:var(--color-text-secondary)">Plan</td><td id="sum-plan">—</td></tr>
+            <tr><td style="color:var(--color-text-secondary)">Vigencia</td><td id="sum-vigencia">—</td></tr>
+            <tr><td colspan="2"><hr class="summary-divider"></td></tr>
+            <tr class="total-row"><td>Total a pagar</td><td id="sum-total" style="color:#185FA5">—</td></tr>
+          </table>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn-outline" onclick="backTo('pago-step1','pago-step2')">← Atrás</button>
+          <button class="btn-primary" style="width:auto;padding:9px 24px" onclick="pagoStep3()">Ir al pago <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+        </div>
+      </div>
+
+      <div id="pago-step3" class="hidden">
+        <div class="page-header">
+          <h2><i class="ti ti-credit-card" aria-hidden="true" style="color:#185FA5"></i> Pago de Marbete</h2>
+        </div>
+        <div class="steps-bar">
+          <div class="step-item"><div class="step-dot done"><i class="ti ti-check" aria-hidden="true"></i></div><span class="step-label">Datos del vehículo</span></div>
+          <div class="step-line"></div>
+          <div class="step-item"><div class="step-dot done"><i class="ti ti-check" aria-hidden="true"></i></div><span class="step-label">Tipo y plan</span></div>
+          <div class="step-line"></div>
+          <div class="step-item"><div class="step-dot active">3</div><span class="step-label active">Pago</span></div>
+        </div>
+        <div class="payment-box">
+          <div class="pay-icon"><i class="ti ti-lock" aria-hidden="true"></i></div>
+          <h3>Pasarela de Pago Simulada</h3>
+          <p>Ingrese los datos de la tarjeta para procesar el pago de <strong id="pay-amount">Q50</strong></p>
+          <div class="form-group" style="text-align:left;max-width:380px;margin:0 auto 8px">
+            <label>Número de tarjeta</label>
+            <input type="text" placeholder="1234 5678 9012 3456" maxlength="19">
+          </div>
+          <div class="card-input-row" style="max-width:380px;margin:0 auto">
+            <div class="form-group" style="text-align:left"><label>Nombre en tarjeta</label><input type="text" placeholder="NOMBRE APELLIDO"></div>
+            <div class="form-group" style="text-align:left"><label>Vencimiento</label><input type="text" placeholder="MM/AA" maxlength="5"></div>
+            <div class="form-group" style="text-align:left"><label>CVV</label><input type="text" placeholder="123" maxlength="3"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn-outline" onclick="backTo('pago-step2','pago-step3')">← Atrás</button>
+          <button class="btn-primary" style="width:auto;padding:9px 24px;background:#3B6D11" onclick="procesarPago()"><i class="ti ti-shield-check" aria-hidden="true"></i> Confirmar pago</button>
+        </div>
+      </div>
+
+      <div id="pago-step4" class="hidden">
+        <div style="text-align:center;padding:20px 0 24px">
+          <div style="width:56px;height:56px;background:#EAF3DE;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;color:#3B6D11"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+          <h2 style="font-size:18px;font-weight:500;margin-bottom:4px">¡Pago procesado exitosamente!</h2>
+          <p style="font-size:13px;color:var(--color-text-secondary)">El marbete ha sido generado. Se enviará el comprobante al correo registrado.</p>
+        </div>
+        <div class="receipt">
+          <div class="receipt-header">
+            <div class="receipt-logo">Universidad — Portal de Marbetes<span>NIT: CF — Exento</span></div>
+            <div style="display:flex;align-items:flex-start;gap:16px">
+              <div class="receipt-num">Comprobante<strong id="rec-num">#MRB-2025-0001</strong><span id="rec-fecha" style="display:block;font-size:11px;margin-top:2px"></span></div>
+              <div class="receipt-qr" id="qr-mini">QR<br>VERIF.</div>
+            </div>
+          </div>
+          <table class="receipt-body" width="100%">
+            <tr><td>Propietario</td><td id="rec-nombre" style="text-align:right;font-weight:500">—</td></tr>
+            <tr><td>Número de placa</td><td id="rec-placa" style="text-align:right;font-weight:500;font-family:var(--font-mono)">—</td></tr>
+            <tr><td>Vehículo</td><td id="rec-vehiculo" style="text-align:right">—</td></tr>
+            <tr><td>Tipo de marbete</td><td id="rec-tipo" style="text-align:right">—</td></tr>
+            <tr><td>Plan</td><td id="rec-plan" style="text-align:right">—</td></tr>
+            <tr><td>Válido desde</td><td id="rec-desde" style="text-align:right">—</td></tr>
+            <tr><td>Válido hasta</td><td id="rec-hasta" style="text-align:right">—</td></tr>
+          </table>
+          <div class="receipt-footer">
+            <span class="badge badge-success"><i class="ti ti-circle-check" aria-hidden="true"></i> Pago verificado</span>
+            <strong id="rec-total" style="font-size:18px;color:#185FA5">Q50.00</strong>
+          </div>
+        </div>
+        <div class="actions-row">
+          <button class="btn-outline" onclick="gotoModule('reimpresion')"><i class="ti ti-printer" aria-hidden="true"></i> Ver en formato factura</button>
+          <button class="btn-outline" onclick="resetPago()"><i class="ti ti-plus" aria-hidden="true"></i> Nuevo marbete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONSULTA -->
+    <div id="page-consulta" class="page">
+      <div class="page-header">
+        <h2><i class="ti ti-search" aria-hidden="true" style="color:#3B6D11"></i> Consulta de Marbete</h2>
+        <p>Busque por número de placa para ver el estado y vigencia del marbete</p>
+      </div>
+      <div class="search-box">
+        <select id="q-tipo" style="width:140px;padding:9px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;background:var(--color-background-primary);color:var(--color-text-primary)">
+          <option value="">Tipo de placa</option>
+          <option>Particular</option>
+          <option>Comercial</option>
+          <option>Motocicleta</option>
+        </select>
+        <input type="text" id="q-placa" placeholder="Ingrese número de placa (Ej. P-123ABC)" style="text-transform:uppercase" onkeydown="if(event.key==='Enter')buscarPlaca()">
+        <button class="btn-primary" style="width:auto;padding:9px 18px" onclick="buscarPlaca()"><i class="ti ti-search" aria-hidden="true"></i> Buscar</button>
+      </div>
+      <div id="q-hint" style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:8px">Placas de prueba: P-001ABC · C-002DEF · M-003GHI</div>
+      <div id="q-result"></div>
+    </div>
+
+    <!-- REIMPRESION -->
+    <div id="page-reimpresion" class="page">
+      <div class="page-header">
+        <h2><i class="ti ti-printer" aria-hidden="true" style="color:#854F0B"></i> Reimpresión de Marbete</h2>
+        <p>Genere la factura oficial con código QR para verificación e impresión</p>
+      </div>
+      <div class="search-box">
+        <input type="text" id="r-placa" placeholder="Ingrese número de placa para buscar" style="text-transform:uppercase" onkeydown="if(event.key==='Enter')buscarReimpresion()">
+        <button class="btn-primary" style="width:auto;padding:9px 18px" onclick="buscarReimpresion()"><i class="ti ti-search" aria-hidden="true"></i> Buscar</button>
+      </div>
+      <div id="r-hint" style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:8px">Placas de prueba: P-001ABC · C-002DEF · M-003GHI</div>
+      <div id="r-result"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const DB = {
+  'P-001ABC': {placa:'P-001ABC',tipo:'Particular',nombre:'Carlos Alberto Méndez',cui:'1234 56789 1234',rol:'Docente',email:'cmendez@uni.edu.gt',tel:'5555-1234',marca:'Toyota',modelo:'Corolla',anio:'2021',color:'Plata',tipoMarbete:'Docente',plan:'Anual',precio:750,desde:'01/01/2025',hasta:'31/12/2025',estado:'Vigente',diasRestantes:218,historial:[{fecha:'01/01/2025',tipo:'Anual',monto:'Q750',estado:'Pagado'},{fecha:'01/01/2024',tipo:'Anual',monto:'Q750',estado:'Pagado'}]},
+  'C-002DEF': {placa:'C-002DEF',tipo:'Comercial',nombre:'Ana Lucía Pérez',cui:'5678 90123 4567',rol:'Estudiante',email:'aperez@uni.edu.gt',tel:'5555-5678',marca:'Honda',modelo:'CR-V',anio:'2019',color:'Negro',tipoMarbete:'Estudiante',plan:'Mensual',precio:50,desde:'01/05/2025',hasta:'31/05/2025',estado:'Por vencer',diasRestantes:3,historial:[{fecha:'01/05/2025',tipo:'Mensual',monto:'Q50',estado:'Pagado'},{fecha:'01/04/2025',tipo:'Mensual',monto:'Q50',estado:'Pagado'},{fecha:'01/03/2025',tipo:'Mensual',monto:'Q50',estado:'Pagado'}]},
+  'M-003GHI': {placa:'M-003GHI',tipo:'Motocicleta',nombre:'Roberto Díaz',cui:'9012 34567 8901',rol:'Administrativo',email:'rdiaz@uni.edu.gt',tel:'5555-9012',marca:'Yamaha',modelo:'FZ150',anio:'2022',color:'Rojo',tipoMarbete:'Administrativo',plan:'Mensual',precio:75,desde:'01/04/2025',hasta:'30/04/2025',estado:'Vencido',diasRestantes:-28,historial:[{fecha:'01/04/2025',tipo:'Mensual',monto:'Q75',estado:'Pagado'},{fecha:'01/03/2025',tipo:'Mensual',monto:'Q75',estado:'Pagado'}]}
+};
+
+let selectedType={name:'',monthly:50,annual:500};
+let selectedPlan='mensual';
+let pagoData={};
+
+function doLogin(){
+  document.getElementById('page-login').classList.remove('active');
+  document.getElementById('main-layout').classList.remove('hidden');
+}
+function doLogout(){
+  document.getElementById('main-layout').classList.add('hidden');
+  document.getElementById('page-login').classList.add('active');
+}
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+function gotoModule(mod){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const tabs=document.querySelectorAll('.nav-tab');
+  const map={'pago':1,'consulta':2,'reimpresion':3};
+  if(map[mod]!==undefined) tabs[map[mod]].classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+mod).classList.add('active');
+}
+function backTo(show,hide){
+  document.getElementById(hide).classList.add('hidden');
+  document.getElementById(show).classList.remove('hidden');
+}
+
+function pagoStep2(){
+  const p=document.getElementById('p-placa').value.trim().toUpperCase()||'P-000XXX';
+  const tipo=document.getElementById('p-tipo-placa').value||'Particular';
+  pagoData.placa=p; pagoData.tipo=tipo;
+  pagoData.nombre=document.getElementById('p-nombre').value||'Propietario';
+  pagoData.marca=document.getElementById('p-marca').value||'Marca';
+  pagoData.modelo=document.getElementById('p-modelo').value||'Modelo';
+  pagoData.anio=document.getElementById('p-anio').value||'2025';
+  pagoData.color=document.getElementById('p-color').value||'Color';
+  updateSummary();
+  document.getElementById('pago-step1').classList.add('hidden');
+  document.getElementById('pago-step2').classList.remove('hidden');
+}
+function pagoStep3(){
+  document.getElementById('pay-amount').textContent='Q'+(selectedPlan==='mensual'?selectedType.monthly:selectedType.annual);
+  document.getElementById('pago-step2').classList.add('hidden');
+  document.getElementById('pago-step3').classList.remove('hidden');
+}
+function selectType(el,name,m,a){
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType={name,monthly:m,annual:a};
+  document.getElementById('price-mensual').textContent='Q'+m;
+  document.getElementById('price-anual').textContent='Q'+a;
+  updateSummary();
+}
+function selectPlan(plan){
+  selectedPlan=plan;
+  document.getElementById('plan-mensual').classList.toggle('selected',plan==='mensual');
+  document.getElementById('plan-anual').classList.toggle('selected',plan==='anual');
+  updateSummary();
+}
+function updateSummary(){
+  const precio=selectedPlan==='mensual'?selectedType.monthly:selectedType.annual;
+  const hoy=new Date();
+  const fin=new Date(hoy);
+  if(selectedPlan==='mensual') fin.setMonth(fin.getMonth()+1);
+  else fin.setFullYear(fin.getFullYear()+1);
+  document.getElementById('sum-placa').textContent=pagoData.placa||'—';
+  document.getElementById('sum-tipo').textContent=selectedType.name||'—';
+  document.getElementById('sum-plan').textContent=selectedPlan==='mensual'?'Mensual':'Anual';
+  document.getElementById('sum-vigencia').textContent=selectedType.name?formatDate(hoy)+' al '+formatDate(fin):'—';
+  document.getElementById('sum-total').textContent=selectedType.name?'Q'+precio+'.00':'—';
+}
+function formatDate(d){return d.toLocaleDateString('es-GT',{day:'2-digit',month:'2-digit',year:'numeric'})}
+function formatDateStr(d){return d.toLocaleDateString('es-GT',{day:'2-digit',month:'long',year:'numeric'})}
+function procesarPago(){
+  const hoy=new Date();
+  const fin=new Date(hoy);
+  if(selectedPlan==='mensual') fin.setMonth(fin.getMonth()+1);
+  else fin.setFullYear(fin.getFullYear()+1);
+  const precio=selectedPlan==='mensual'?selectedType.monthly:selectedType.annual;
+  const num='#MRB-2025-'+String(Math.floor(Math.random()*9000)+1000);
+  document.getElementById('rec-num').textContent=num;
+  document.getElementById('rec-fecha').textContent=formatDate(hoy);
+  document.getElementById('rec-nombre').textContent=pagoData.nombre;
+  document.getElementById('rec-placa').textContent=pagoData.placa;
+  document.getElementById('rec-vehiculo').textContent=(pagoData.marca||'')+ ' '+(pagoData.modelo||'')+' '+(pagoData.anio||'');
+  document.getElementById('rec-tipo').textContent=selectedType.name||'Estudiante';
+  document.getElementById('rec-plan').textContent=selectedPlan==='mensual'?'Mensual':'Anual';
+  document.getElementById('rec-desde').textContent=formatDate(hoy);
+  document.getElementById('rec-hasta').textContent=formatDate(fin);
+  document.getElementById('rec-total').textContent='Q'+precio+'.00';
+  const qr=document.getElementById('qr-mini');
+  qr.innerHTML='<svg width="50" height="50" viewBox="0 0 50 50"><rect width="50" height="50" fill="var(--color-background-secondary)" rx="3"/><g fill="var(--color-text-primary)" opacity=".7"><rect x="4" y="4" width="16" height="16" rx="1"/><rect x="6" y="6" width="12" height="12" rx="1" fill="var(--color-background-secondary)"/><rect x="8" y="8" width="8" height="8" rx="1"/><rect x="30" y="4" width="16" height="16" rx="1"/><rect x="32" y="6" width="12" height="12" rx="1" fill="var(--color-background-secondary)"/><rect x="34" y="8" width="8" height="8" rx="1"/><rect x="4" y="30" width="16" height="16" rx="1"/><rect x="6" y="32" width="12" height="12" rx="1" fill="var(--color-background-secondary)"/><rect x="8" y="34" width="8" height="8" rx="1"/><rect x="24" y="24" width="4" height="4"/><rect x="30" y="24" width="4" height="4"/><rect x="36" y="24" width="4" height="4"/><rect x="42" y="24" width="4" height="4"/><rect x="24" y="30" width="4" height="4"/><rect x="36" y="30" width="4" height="4"/><rect x="24" y="36" width="4" height="4"/><rect x="30" y="36" width="4" height="4"/><rect x="42" y="36" width="4" height="4"/><rect x="24" y="42" width="4" height="4"/><rect x="36" y="42" width="4" height="4"/><rect x="42" y="42" width="4" height="4"/></g></svg>';
+  document.getElementById('pago-step3').classList.add('hidden');
+  document.getElementById('pago-step4').classList.remove('hidden');
+}
+function resetPago(){
+  ['pago-step2','pago-step3','pago-step4'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById('pago-step1').classList.remove('hidden');
+  selectedType={name:'',monthly:50,annual:500};
+  selectedPlan='mensual';
+}
+
+function buscarPlaca(){
+  const placa=document.getElementById('q-placa').value.trim().toUpperCase();
+  const r=document.getElementById('q-result');
+  if(!placa){r.innerHTML='<div class="empty-state"><div class="empty-icon"><i class="ti ti-alert-circle" aria-hidden="true"></i></div><p>Ingrese un número de placa para buscar.</p></div>';return;}
+  const data=DB[placa];
+  if(!data){
+    r.innerHTML='<div class="empty-state"><div class="empty-icon"><i class="ti ti-car-off" aria-hidden="true"></i></div><p>No se encontró ningún marbete para la placa <strong>'+placa+'</strong>.</p><p style="font-size:12px;margin-top:4px">Verifique el número e intente nuevamente.</p></div>';return;
+  }
+  const badge=data.estado==='Vigente'?'badge-success':data.estado==='Por vencer'?'badge-warning':'badge-danger';
+  const pct=data.estado==='Vencido'?0:Math.min(100,Math.max(0,Math.round((data.diasRestantes/(data.plan==='Anual'?365:30))*100)));
+  const barColor=data.estado==='Vigente'?'#639922':data.estado==='Por vencer'?'#EF9F27':'#E24B4A';
+  const histRows=data.historial.map(h=>`<tr><td>${h.fecha}</td><td>${h.tipo}</td><td>${h.monto}</td><td><span class="badge badge-success">${h.estado}</span></td></tr>`).join('');
+  r.innerHTML=`<div class="result-card">
+    <div class="result-header">
+      <div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">${data.tipo}</div>
+        <div class="result-plate">${data.placa}</div>
+      </div>
+      <span class="badge ${badge}">${data.estado}${data.diasRestantes>0?' · '+data.diasRestantes+' días':data.estado==='Vencido'?' · Hace '+Math.abs(data.diasRestantes)+' días':''}</span>
+    </div>
+    <div class="result-body">
+      <div class="info-grid">
+        <div class="info-item"><div class="ilabel">Propietario</div><div class="ivalue">${data.nombre}</div></div>
+        <div class="info-item"><div class="ilabel">Rol</div><div class="ivalue">${data.rol}</div></div>
+        <div class="info-item"><div class="ilabel">Vehículo</div><div class="ivalue">${data.marca} ${data.modelo} ${data.anio}</div></div>
+        <div class="info-item"><div class="ilabel">Tipo de marbete</div><div class="ivalue">${data.tipoMarbete}</div></div>
+        <div class="info-item"><div class="ilabel">Válido desde</div><div class="ivalue">${data.desde}</div></div>
+        <div class="info-item"><div class="ilabel">Válido hasta</div><div class="ivalue">${data.hasta}</div></div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-bottom:4px"><span>Vigencia</span><span>${pct}%</span></div>
+        <div class="vigencia-bar"><div class="vigencia-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      </div>
+      <div style="font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">Historial de pagos</div>
+      <table class="hist-table">
+        <thead><tr><th>Fecha</th><th>Plan</th><th>Monto</th><th>Estado</th></tr></thead>
+        <tbody>${histRows}</tbody>
+      </table>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn-outline" onclick="prepReimpresion('${data.placa}')"><i class="ti ti-printer" aria-hidden="true"></i> Ver factura / reimprimir</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function prepReimpresion(placa){
+  document.getElementById('r-placa').value=placa;
+  gotoModule('reimpresion');
+  buscarReimpresion();
+}
+
+function buscarReimpresion(){
+  const placa=document.getElementById('r-placa').value.trim().toUpperCase();
+  const r=document.getElementById('r-result');
+  if(!placa){r.innerHTML='<div class="empty-state"><div class="empty-icon"><i class="ti ti-printer" aria-hidden="true"></i></div><p>Ingrese un número de placa para buscar.</p></div>';return;}
+  const data=DB[placa];
+  if(!data){r.innerHTML='<div class="empty-state"><div class="empty-icon"><i class="ti ti-car-off" aria-hidden="true"></i></div><p>No se encontró ningún marbete para la placa <strong>'+placa+'</strong>.</p></div>';return;}
+  const badge=data.estado==='Vigente'?'badge-success':data.estado==='Por vencer'?'badge-warning':'badge-danger';
+  const numFac='FAC-2025-'+placa.replace(/[^A-Z0-9]/g,'').substring(0,6);
+  r.innerHTML=`<div class="actions-row no-print" style="margin-bottom:12px">
+    <button class="btn-primary" style="width:auto;padding:8px 18px;background:#185FA5" onclick="window.print()"><i class="ti ti-printer" aria-hidden="true"></i> Imprimir</button>
+    <button class="btn-outline" onclick="window.print()"><i class="ti ti-download" aria-hidden="true"></i> Descargar PDF</button>
+  </div>
+  <div class="factura">
+    <div class="factura-head">
+      <div>
+        <h3>Marbete de Acceso Vehicular</h3>
+        <span>Universidad — Depto. de Seguridad y Control de Acceso</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;opacity:.7">No. Factura</div>
+        <div style="font-size:18px;font-weight:500">${numFac}</div>
+      </div>
+    </div>
+    <div class="factura-body">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start">
+        <div>
+          <div class="factura-section">
+            <div class="factura-section-title">Datos del propietario</div>
+            <div class="factura-row"><span>Nombre</span><span>${data.nombre}</span></div>
+            <div class="factura-row"><span>CUI / DPI</span><span>${data.cui}</span></div>
+            <div class="factura-row"><span>Rol</span><span>${data.rol}</span></div>
+            <div class="factura-row"><span>Correo</span><span>${data.email}</span></div>
+          </div>
+          <div class="factura-section">
+            <div class="factura-section-title">Datos del vehículo</div>
+            <div class="factura-row"><span>Placa</span><span style="font-family:var(--font-mono);font-weight:500">${data.placa}</span></div>
+            <div class="factura-row"><span>Tipo de placa</span><span>${data.tipo}</span></div>
+            <div class="factura-row"><span>Vehículo</span><span>${data.marca} ${data.modelo} ${data.anio}</span></div>
+            <div class="factura-row"><span>Color</span><span>${data.color}</span></div>
+          </div>
+          <div class="factura-section">
+            <div class="factura-section-title">Datos del marbete</div>
+            <div class="factura-row"><span>Tipo de marbete</span><span>${data.tipoMarbete}</span></div>
+            <div class="factura-row"><span>Plan</span><span>${data.plan}</span></div>
+            <div class="factura-row"><span>Fecha de emisión</span><span>${data.desde}</span></div>
+            <div class="factura-row"><span>Fecha de vencimiento</span><span>${data.hasta}</span></div>
+            <div class="factura-row"><span>Estado</span><span><span class="badge ${badge}">${data.estado}</span></span></div>
+          </div>
+        </div>
+        <div class="qr-block">
+          <svg width="90" height="90" viewBox="0 0 90 90" style="border:0.5px solid var(--color-border-tertiary);border-radius:6px;padding:6px;background:var(--color-background-primary)">
+            <g fill="var(--color-text-primary)" opacity=".85">
+              <rect x="0" y="0" width="38" height="38" rx="2"/><rect x="4" y="4" width="30" height="30" rx="2" fill="var(--color-background-primary)"/><rect x="10" y="10" width="18" height="18" rx="1"/>
+              <rect x="52" y="0" width="38" height="38" rx="2"/><rect x="56" y="4" width="30" height="30" rx="2" fill="var(--color-background-primary)"/><rect x="62" y="10" width="18" height="18" rx="1"/>
+              <rect x="0" y="52" width="38" height="38" rx="2"/><rect x="4" y="56" width="30" height="30" rx="2" fill="var(--color-background-primary)"/><rect x="10" y="62" width="18" height="18" rx="1"/>
+              <rect x="44" y="44" width="8" height="8"/><rect x="54" y="44" width="8" height="8"/><rect x="64" y="44" width="8" height="8"/><rect x="74" y="44" width="8" height="8"/><rect x="84" y="44" width="6" height="8"/>
+              <rect x="44" y="54" width="8" height="8"/><rect x="64" y="54" width="8" height="8"/><rect x="44" y="64" width="8" height="8"/><rect x="54" y="64" width="8" height="8"/><rect x="84" y="64" width="6" height="8"/>
+              <rect x="44" y="74" width="8" height="8"/><rect x="64" y="74" width="8" height="8"/><rect x="74" y="74" width="8" height="8"/>
+            </g>
+          </svg>
+          <div class="qr-label" style="font-size:10px;color:var(--color-text-secondary);text-align:center;max-width:90px">Escanear para verificar</div>
+          <div style="font-size:9px;color:var(--color-text-tertiary);font-family:var(--font-mono);text-align:center">${numFac}</div>
+        </div>
+      </div>
+    </div>
+    <div class="factura-total">
+      <div>
+        <span>Total pagado</span>
+      </div>
+      <div class="amount">Q${data.precio}.00</div>
+    </div>
+  </div>`;
+}
+</script>
