@@ -1,5 +1,6 @@
+import 'dotenv/config';
 import express from 'express';
-import path from 'path';
+import path from 'node:path';
 import apiRouter from './src/routes/api.js';
 import webhookRouter from './src/routes/webhooks.js';
 
