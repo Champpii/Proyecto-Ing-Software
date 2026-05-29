@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Inicialización del cliente de Supabase leyendo el archivo .env
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = 'https://eohkccmirbhbqcdsfuvy.supabase.co';
+const supabaseKey = 'sb_publishable_Lv2jIjDu0LmWOvy-sNbRgQ_1iMV7qWr';
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('[SupabaseError] Faltan las variables de entorno SUPABASE_URL o SUPABASE_KEY en el .env');
@@ -39,9 +39,7 @@ export const jsonDb = {
 
       // Sistema de respaldo por si se filtra usando funciones personalizadas de JavaScript
       const { data: allData } = await supabase.from(table).select('*');
-      if (!filterFn || typeof filterFn !== 'function') return null;
-      // No pasar la función directamente a .find por motivos de seguridad/linting
-      return (allData || []).find(item => filterFn(item));
+      return (allData || []).find(filterFn);
     } catch (err) {
       console.error(`Error en findOne para la tabla ${table}:`, err.message);
       return null;

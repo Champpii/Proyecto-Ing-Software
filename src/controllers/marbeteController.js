@@ -15,8 +15,8 @@ export const marbeteController = {
         return res.status(400).json({ success: false, message: 'Número de placa requerido.' });
       }
 
-      // Find vehicle
-      const vehicle = jsonDb.findOne('vehicles', v => v.placa === placa);
+      // Find vehicle - Adaptado con await pasándole los parámetros explícitos para Supabase
+      const vehicle = await jsonDb.findOne('vehicles', v => v.placa === placa, 'placa', placa);
       if (!vehicle) {
         return res.status(404).json({ 
           success: false, 
@@ -24,11 +24,11 @@ export const marbeteController = {
         });
       }
 
-      // Find owner
-      const owner = jsonDb.findOne('users', u => u.id === vehicle.usuario_id);
+      // Find owner - Adaptado con await
+      const owner = await jsonDb.findOne('users', u => u.id === vehicle.usuario_id, 'id', vehicle.usuario_id);
       
-      // Find active marbete
-      const marbete = jsonDb.findOne('marbetes', m => m.placa === placa);
+      // Find active marbete - Adaptado con await
+      const marbete = await jsonDb.findOne('marbetes', m => m.placa === placa, 'placa', placa);
       if (!marbete) {
         return res.json({
           success: true,
@@ -42,19 +42,19 @@ export const marbeteController = {
       // Recalculate status and days remaining in real-time
       const { estado, diasRestantes } = pricingService.getStatusAndDaysRemaining(marbete.fecha_caducidad);
       
-      // Update DB if state changed
+      // Update DB if state changed - Adaptado con await
       if (marbete.estado !== estado) {
-        jsonDb.update('marbetes', m => m.id === marbete.id, { estado });
+        await jsonDb.update('marbetes', m => m.id === marbete.id, { estado }, 'id', marbete.id);
         marbete.estado = estado;
       }
       
       marbete.diasRestantes = diasRestantes;
 
-      // Get payments history
-      const payments = jsonDb.findMany('payments', p => p.marbete_id === marbete.id);
+      // Get payments history - Adaptado con await
+      const payments = await jsonDb.findMany('payments', p => p.marbete_id === marbete.id);
       
-      // Get access audit logs
-      const accessLogs = jsonDb.findMany('access_logs', a => a.placa === placa);
+      // Get access audit logs - Adaptado con await
+      const accessLogs = await jsonDb.findMany('access_logs', a => a.placa === placa);
 
       // Generate verification URL and QR Code
       const protocol = req.protocol;
@@ -73,8 +73,8 @@ export const marbeteController = {
           qrCode: qrDataURI,
           verificationUrl
         },
-        payments: payments.sort((a, b) => new Date(b.fecha_pago) - new Date(a.fecha_pago)),
-        accessLogs: accessLogs.sort((a, b) => new Date(b.fecha_acceso) - new Date(a.fecha_acceso))
+       payments: Array.isArray(payments) ? payments.sort((a, b) => new Date(b.fecha_pago) - new Date(a.fecha_pago)) : [],
+        accessLogs: Array.isArray(accessLogs) ? accessLogs.sort((a, b) => new Date(b.fecha_acceso) - new Date(a.fecha_acceso)) : []
       });
     } catch (err) {
       console.error('Error consulting marbete:', err);
@@ -93,10 +93,11 @@ export const marbeteController = {
         return res.status(400).json({ success: false, message: 'Token de verificación requerido.' });
       }
 
-      const marbete = jsonDb.findOne('marbetes', m => m.token_verificacion === token);
+      // Find marbete - Adaptado con await
+      const marbete = await jsonDb.findOne('marbetes', m => m.token_verificacion === token, 'token_verificacion', token);
       if (!marbete) {
-        // Record unauthorized access audit log
-        jsonDb.insert('access_logs', {
+        // Record unauthorized access audit log - Adaptado con await
+        await jsonDb.insert('access_logs', {
           placa: 'DESCONOCIDO',
           fecha_acceso: new Date().toISOString(),
           garita: 'Garita de Control QR',
@@ -110,14 +111,15 @@ export const marbeteController = {
         });
       }
 
-      const vehicle = jsonDb.findOne('vehicles', v => v.placa === marbete.placa);
-      const owner = jsonDb.findOne('users', u => u.id === vehicle.usuario_id);
+      // Find vehicle y owner - Adaptado con await
+      const vehicle = await jsonDb.findOne('vehicles', v => v.placa === marbete.placa, 'placa', marbete.placa);
+      const owner = await jsonDb.findOne('users', u => u.id === vehicle.usuario_id, 'id', vehicle.usuario_id);
       
       // Calculate real-time status
       const { estado, diasRestantes } = pricingService.getStatusAndDaysRemaining(marbete.fecha_caducidad);
       
-      // Add audit log for this QR scan
-      jsonDb.insert('access_logs', {
+      // Add audit log for this QR scan - Adaptado con await
+      await jsonDb.insert('access_logs', {
         placa: marbete.placa,
         fecha_acceso: new Date().toISOString(),
         garita: 'Garita de Control QR',
